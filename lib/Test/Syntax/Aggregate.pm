@@ -6,7 +6,7 @@ use warnings;
 use parent qw(Test::Builder::Module Exporter);
 use IPC::Open2;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @EXPORT = ('check_scripts_syntax');
 
