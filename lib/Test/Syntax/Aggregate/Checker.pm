@@ -70,12 +70,19 @@ EOS
                 local *STDERR;
                 eval $eval;
             }
-            if ($@) {
+            my $err = $@;
+
+            # Don't want to run END blocks
+            require POSIX;
+
+            if ($err) {
                 warn "Can't compile $_: $@\n";
-                exit 1;
+                close STDERR;
+                close STDOUT;
+                POSIX::_exit(1);
             }
             else {
-                exit 0;
+                POSIX::_exit(0);
             }
         }
     }
