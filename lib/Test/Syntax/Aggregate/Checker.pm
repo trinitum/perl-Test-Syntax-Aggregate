@@ -59,6 +59,9 @@ $shebang;
 $script
 }
 EOS
+            my $dir = $_;
+            $dir =~ s/(?<=[\\\/])[^\\\/]+$//;
+            chdir $dir if $dir;
             {
                 no strict;
                 no warnings;
