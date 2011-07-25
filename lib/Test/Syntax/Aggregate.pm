@@ -37,6 +37,29 @@ scripts wrapping them into functions.
 
 =head2 check_scripts_syntax(%parameters)
 
+Runs syntax checks for all specified files. Accepts following parameters:
+
+=over 4
+
+=item preload
+
+Reference to array with list of modules that must be preloaded before testing.
+Preloading modules allows you significantly speedup testing.
+
+=item scripts
+
+Reference to array containing list of scripts to check syntax.
+
+=item libs
+
+List of directories to look for modules files. Defaults to I<@INC>.
+
+=item hide_warnings
+
+Hide any warnings produced by scripts during checks unless check failed.
+
+=back
+
 =cut
 
 sub check_scripts_syntax {
@@ -46,13 +69,14 @@ sub check_scripts_syntax {
     my @modules = $params{preload} ? @{ $params{preload} } : ();
     push @modules, "Test::Syntax::Aggregate::Checker";
     my @scripts = @{ $params{scripts} };
+    my $hide_warnings = $params{hide_warnings} ? 1 : 0;
 
     my $subtest = __PACKAGE__->builder->child( $params{name} ? $params{name} : "Scripts syntax" );
     $subtest->plan( tests => 0 + @scripts );
     
     # This child will actually check scripts
     my ( $wrfd, $rdfd );
-    my $pid = open2( $rdfd, $wrfd, $^X, (map { "-I$_" } @libs), (map { "-M$_" } @modules), "-e", "Test::Syntax::Aggregate::Checker->run" );
+    my $pid = open2( $rdfd, $wrfd, $^X, (map { "-I$_" } @libs), (map { "-M$_" } @modules), "-e", "Test::Syntax::Aggregate::Checker->run(hide_warnings => $hide_warnings)" );
     $wrfd->autoflush;
 
     for (@scripts) {
